@@ -30,7 +30,7 @@ end_per_testcase(_Name, _Config) -> ok.
 
 random(_Config) ->
     Ns = [rand:uniform(4444) || _ <- lists:duplicate(30000, undefined)],
-    test(Ns).
+    cvm_utils:test(Ns).
 
 hamlet(Config) ->
     Hamlet = filename:join(?config(data_dir,Config), "hamlet.txt"),
@@ -57,20 +57,4 @@ hamlet(Config) ->
                             end
                     end,
                       Words0),
-    test(Words).
-
-test(List) ->
-    Len = length(List),
-
-    CVM0 = cvm:new(Len),
-    CVM1 = cvm:bulk_insert(List, CVM0),
-    CVMCap = cvm:capacity(CVM1),
-    CVMCnt = cvm:est(CVM1),
-    TrueCnt = naive(List),
-    io:format(user,"Total elements: ~p, Capacity: ~p, True distinct count: ~p, EST dirstinct count: ~p~n", [Len, CVMCap, TrueCnt, CVMCnt]),
-    Err = CVMCnt-TrueCnt,
-    ErrPctg = (abs(Err) / CVMCnt) * 100,
-    io:format(user,"Error: ~p (~.2f %)~n", [Err, ErrPctg]).
-
-naive(List) ->
-    sets:size(sets:from_list(List)).
+    cvm_utils:test(Words).
